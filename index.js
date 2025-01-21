@@ -25,6 +25,7 @@ app.get('/', (req, res) => {
 });
 
 
+
 app.use('/companys', companysRouter);
 
 app.listen(process.env.EXPRESS_PORT, () => {

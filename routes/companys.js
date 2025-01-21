@@ -54,7 +54,7 @@ router.post('/seed', async (req, res)=>{
         await Company.deleteMany({});
 
         //nieuwe toevoegen
-        for (let i = 0; i < req.body.amount; i++){
+        for (let i = 0; i < 30; i++){
             await Company.create({
                 title: faker.word.adjective(),
                 description: faker.lorem.paragraph(),

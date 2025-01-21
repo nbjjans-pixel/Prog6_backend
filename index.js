@@ -24,6 +24,7 @@ app.get('/', (req, res) => {
     res.json({message: 'welcome'})
 });
 
+
 app.use('/companys', companysRouter);
 
 app.listen(process.env.EXPRESS_PORT, () => {
@@ -43,18 +44,12 @@ app.listen(process.env.EXPRESS_PORT, () => {
 
 
 
+// // Middleware voor Accept header validatie
+// const acceptJsonMiddleware = (req, res, next) => {
+//     if (req.headers['accept'] !== 'application/json') {
+//         return res.status(406).json({ error: 'Accept header must be application/json' });
+//     }
+//     next();
+// };
 
-
-// import express from 'express';
-// import mongoose from "mongoose";
-//
-// const app = express();
-// mongoose.connect(`mongodb://127.0.0.1:27017/${process.env.DB_NAME}`);
-//
-// app.get('/', (req, res) => {
-//     res.send('Hello World!');
-// });
-//
-// app.listen(process.env.EXPRESS_PORT, () => {
-//     console.log('server is gestart')
-// });
+// app.use(acceptJsonMiddleware);

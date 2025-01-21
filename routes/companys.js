@@ -150,6 +150,27 @@ router.put('/:_id', async (req, res) => {
     }
 });
 
+router.delete('/:_id', async (req, res) => {
+    try {
+        const { _id } = req.params;
+
+        // Probeer de resource te verwijderen
+        const result = await Company.findByIdAndDelete(_id);
+
+        if (!result) {
+            // Als de resource niet bestaat
+            return res.status(404).json({ error: "Company not found" });
+        }
+
+        // Succesvol verwijderd
+        res.status(204).send(); // Geen inhoud teruggeven
+    } catch (e) {
+        console.error(e); // Log de fout
+        res.status(500).json({ error: "Internal Server Error" }); // Onverwachte serverfout
+    }
+});
+
+
 
 
 

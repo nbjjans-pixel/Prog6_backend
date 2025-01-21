@@ -9,6 +9,12 @@ router.options('/', (req, res)=>{
     res.status(204).send();
 });
 
+router.options('/:_id', (req, res) => {
+    res.header('Allow', 'GET, PUT, DELETE, OPTIONS');
+    res.status(204).send();
+});
+
+
 const formatCompany = (company) => ({
     id: company._id,
     title: company.title,
@@ -115,6 +121,35 @@ router.get('/:_id', async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+router.put('/:_id', async (req, res) => {
+    try {
+        const { title, description, review } = req.body;
+
+        // Controleer of er minimaal één veld is om bij te werken
+        if (!title && !description && !review) {
+            return res.status(400).json({ error: "At least one field (title, description, review) is required to update." });
+        }
+
+        // Zoek en werk de resource bij... findByIdAndUpdate is van mongoose
+        const company = await Company.findByIdAndUpdate(
+            req.params._id, // ID van de resource
+            { title, description, review }, // Gegevens om bij te werken
+            { new: true, runValidators: true } // Retourneer het bijgewerkte document
+        );
+
+        if (!company) {
+            return res.status(404).json({ error: "Company not found (ID KLOPT TOCH? 😃😃)" });
+        }
+
+        // Format de geüpdatete resource en retourneer deze
+        res.status(200).json({ item: formatCompany(company) });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 
 

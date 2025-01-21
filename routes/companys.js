@@ -17,7 +17,11 @@ const formatCompany = (company) => ({
     _links: {
         self: {
             href: `${process.env.LOCALURL}/companys/${company._id}`
+        },
+        collection: {
+            href: `${process.env.LOCALURL}/companys`
         }
+
     }
 });
 
@@ -69,6 +73,32 @@ router.post('/seed', async (req, res)=>{
     }
 });
 
+router.post('/', async (req, res) => {
+    try {
+        const { title, description, review } = req.body;
+
+        // Valideer invoer
+        if (!title || !description || !review) {
+            return res.status(400).json({ error: "All fields (title, description, review) are required." });
+        }
+
+        // Maak een nieuwe resource aan
+        const company = await Company.create({ title, description, review });
+
+        // Gebruik de formatCompany functie om het antwoord te formatteren
+        const formattedCompany = formatCompany(company);
+
+        // Stuur de gemaakte resource terug
+        res.status(201).json({ item: formattedCompany });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+
+
 router.get('/:_id', async (req, res) => {
     try {
         const company = await Company.findById(req.params._id);
@@ -77,9 +107,9 @@ router.get('/:_id', async (req, res) => {
             return res.status(404).json({ error: "Company not found" });
         }
 
-        res.json({
-            item: formatCompany(company) // Kijk boven voor fucntie
-        });
+        res.json(
+            formatCompany(company),    // Kijk boven voor fucntie
+        );
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: "Internal Server Error" });

@@ -58,25 +58,86 @@ const formatCompany = (company) => ({
 
 router.get('/', async (req, res) => {
     try {
-        const companys = await Company.find();
-        const items = companys.map(formatCompany); // Kijk boven voor fucntie
+        const page = parseInt(req.query.page) || null; // Fallback naar null als geen paginering
+        const limit = parseInt(req.query.limit) || null;
+
+        const baseUrl = `${process.env.LOCALURL}/companys`;
+
+        if (!page || !limit) {
+            // Geen paginering ingesteld, haal alles op
+            const companys = await Company.find();
+            const items = companys.map(formatCompany);
+
+            res.json({
+                items,
+                _links: {
+                    self: { href: baseUrl }
+                },
+                pagination: {
+                    currentPage: 1,
+                    currentItems: items.length,
+                    totalPages: 1,
+                    totalItems: items.length,
+                    _links: {
+                        first: { page: 1, href: baseUrl },
+                        last: { page: 1, href: baseUrl },
+                        previous: null,
+                        next: null
+                    }
+                }
+            });
+            return;
+        }
+
+        // Bereken paginering
+        const skip = (page - 1) * limit;
+        const totalItems = await Company.countDocuments();
+        const totalPages = Math.ceil(totalItems / limit);
+
+        const companys = await Company.find().skip(skip).limit(limit);
+        const items = companys.map(formatCompany);
+
+        const pagination = {
+            currentPage: page,
+            currentItems: items.length,
+            totalPages,
+            totalItems,
+            _links: {
+                first: {
+                    page: 1,
+                    href: `${baseUrl}?page=1&limit=${limit}`
+                },
+                last: {
+                    page: totalPages,
+                    href: `${baseUrl}?page=${totalPages}&limit=${limit}`
+                },
+                previous: page > 1 ? {
+                    page: page - 1,
+                    href: `${baseUrl}?page=${page - 1}&limit=${limit}`
+                } : null,
+                next: page < totalPages ? {
+                    page: page + 1,
+                    href: `${baseUrl}?page=${page + 1}&limit=${limit}`
+                } : null
+            }
+        };
 
         res.json({
             items,
             _links: {
-                self: {
-                    href: `${process.env.LOCALURL}/companys`
-                },
-                collection: {
-                    href: `${process.env.LOCALURL}/companys`
-                }
-            }
+                self: { href: `${baseUrl}?page=${page}&limit=${limit}` }
+            },
+            pagination
         });
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+
+
+
 
 
 

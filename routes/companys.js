@@ -5,16 +5,9 @@ import cors from 'cors';
 
 const router = express.Router();
 
-const acceptJsonMiddleware = (req, res, next) => {
-    if (req.headers['accept'] !== 'application/json' && req.method !== "OPTIONS") {
-        return res.status(406).json({error: 'Accept header must be application/json'});
-    }
-    next();
-};
-router.use(acceptJsonMiddleware);
 
 const corsMiddleware = (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // Sta toegang toe van alle domeinen
+    res.header('Access-Control-Allow-Origin', '*'); // * staat voor alle dmeienn toestaan
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
@@ -24,8 +17,8 @@ const corsMiddleware = (req, res, next) => {
 // Voeg de middleware toe voor alle routes
 router.use(corsMiddleware);
 router.options('/', (req, res)=>{
-    res.header('Allow', 'GET, POST OPTIONS');
-    res.header('Access-Control-Allow-Methods', 'GET, PUT OPTIONS');
+    res.header('Allow', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization' );
     res.status(204).send();
 });
